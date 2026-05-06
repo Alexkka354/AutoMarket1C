@@ -10,60 +10,68 @@ router = Router()
 async def cmd_start(message: Message):
     await get_or_create_user(message.from_user.id, message.from_user.username)
     await message.answer(
-        f"👋 Привет, {message.from_user.first_name}!\n\n"
+        f"Привет, {message.from_user.first_name}!\n\n"
         "Я бот управления выгрузкой товаров на Авито и ВКонтакте.\n\n"
         "Выберите действие:",
         reply_markup=persistent_keyboard()
     )
     await message.answer(
-        "📋 Основное меню:",
+        "Основное меню:",
         reply_markup=main_menu()
     )
 
-@router.message(lambda m: m.text == "🏠 Главное меню")
+@router.message(lambda m: m.text in ("Главное меню", "\U0001f3e0 Главное меню"))
 async def main_menu_handler(message: Message):
     await message.answer(
-        "📋 Основное меню:",
+        "Основное меню:",
         reply_markup=main_menu()
     )
 
-@router.message(lambda m: m.text == "🚀 Выгрузка")
+@router.message(lambda m: m.text in ("Выгрузка", "\U0001f680 Выгрузка"))
 async def upload_handler(message: Message):
     await message.answer(
-        "🚀 Управление выгрузкой:",
+        "Управление выгрузкой:",
         reply_markup=main_menu()
     )
 
-@router.message(lambda m: m.text == "📊 Аналитика")
+@router.message(lambda m: m.text in ("Аналитика", "\U0001f4ca Аналитика"))
 async def analytics_handler(message: Message):
     from integration_module.client import get_analytics
-    await message.answer("⏳ Загружаю аналитику...")
+    await message.answer("Загружаю аналитику...")
     try:
         stats = await get_analytics()
         if stats:
             await message.answer(
-                f"📊 Аналитика\n\n"
-                f"📦 Товаров в базе: {stats.get('products_count', 0)}\n"
-                f"✅ Активных: {stats.get('active_products', 0)}\n"
-                f"🔄 Последняя синхронизация: {stats.get('last_sync', 'нет данных')}"
+                f"Аналитика\n\n"
+                f"Товаров в базе: {stats.get('products_count', 0)}\n"
+                f"Активных: {stats.get('active_products', 0)}\n"
+                f"Последняя синхронизация: {stats.get('last_sync', 'нет данных')}"
             )
         else:
-            await message.answer("⚠️ Аналитика недоступна.")
+            await message.answer("Аналитика недоступна.")
     except Exception:
-        await message.answer("⚠️ Интеграционный модуль не запущен.")
+        await message.answer("Интеграционный модуль не запущен.")
 
-@router.message(lambda m: m.text == "🤖 Генерация")
+@router.message(lambda m: m.text in ("Генерация", "\U0001f916 Генерация"))
 async def generation_handler(message: Message):
     await message.answer(
-        "🤖 Генерация контента с помощью ИИ\n\n"
+        "Генерация контента с помощью ИИ\n\n"
         "Введите название и характеристики товара:"
     )
     from aiogram.fsm.context import FSMContext
     from bot.handlers.content import ContentState
 
-@router.message(lambda m: m.text == "📘 ВКонтакте")
+@router.message(lambda m: m.text in ("ВКонтакте", "\U0001f4d8 ВКонтакте"))
 async def vk_handler(message: Message):
     await message.answer(
-        "📘 Публикация товара ВКонтакте\n\n"
+        "Публикация товара ВКонтакте\n\n"
         "Введите название и характеристики товара:"
+    )
+
+@router.message(lambda m: m.text == "Авито")
+async def avito_handler(message: Message):
+    from bot.handlers.avito import avito_menu_keyboard
+    await message.answer(
+        "Авито — выберите действие:",
+        reply_markup=avito_menu_keyboard(),
     )
