@@ -29,22 +29,38 @@ async def get_autoload_profile() -> dict:
 
 async def update_autoload_profile(
     feed_url: str,
-    report_email: str | None = None,
+    feed_name: str = "Автозагрузка",
+    report_email: str = "",
     schedule: list[dict] | None = None,
 ) -> dict:
     """POST /autoload/v2/profile — создание / обновление профиля.
 
     feed_url — публичная ссылка на XML-файл с объявлениями.
+    feed_name — название фида (отображается в отчёте).
+    schedule — расписание выгрузок:
+        [{"rate": 50, "weekdays": [0..6], "time_slots": [0..23]}]
     """
-    body: dict = {
+    if schedule is None:
+        schedule = [
+            {
+                "rate": 100,
+                "weekdays": [0, 1, 2, 3, 4, 5, 6],
+                "time_slots": [10],
+            }
+        ]
+
+    body = {
         "agreement": True,
         "autoload_enabled": True,
-        "feeds_data": [{"url": feed_url}],
+        "feeds_data": [
+            {
+                "feed_name": feed_name,
+                "feed_url": feed_url,
+            }
+        ],
+        "report_email": report_email,
+        "schedule": schedule,
     }
-    if report_email:
-        body["report_email"] = report_email
-    if schedule:
-        body["schedule"] = schedule
 
     return await _request("POST", "/autoload/v2/profile", json=body)
 

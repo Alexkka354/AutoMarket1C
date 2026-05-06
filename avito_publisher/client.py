@@ -6,6 +6,9 @@
     - Запуск выгрузки объявлений из XML-файла по ссылке
     - Получение дерева категорий
     - Получение отчётов автозагрузки
+
+Swagger-документация:
+    https://developers.avito.ru/api-catalog/autoload/documentation
 """
 
 import aiohttp
@@ -36,13 +39,18 @@ async def get_autoload_profile() -> dict:
     """Получить текущие настройки профиля автозагрузки.
 
     GET /autoload/v2/profile
+
+    Возвращает:
+        autoload_enabled, feeds_data, report_email, schedule и др.
     """
     return await _request("GET", "/autoload/v2/profile")
 
 
 async def setup_autoload_profile(
     feed_url: str,
-    report_email: str | None = None,
+    feed_name: str = "Автозагрузка",
+    report_email: str = "",
+    schedule: list[dict] | None = None,
 ) -> dict:
     """Создать или обновить профиль автозагрузки.
 
@@ -50,15 +58,38 @@ async def setup_autoload_profile(
 
     Args:
         feed_url: публичная HTTPS-ссылка на XML-файл с объявлениями
-        report_email: email для получения отчётов (опционально)
+        feed_name: название фида (отображается в отчёте)
+        report_email: email для получения отчётов
+        schedule: расписание выгрузок, список словарей вида:
+            [{"rate": 50, "weekdays": [0,1,2,3,4,5,6], "time_slots": [10]}]
+            rate — кол-во объявлений за период
+            weekdays — дни недели (0=пн, 6=вс)
+            time_slots — часы (0-23, время МСК)
+
+    Если schedule не указан, устанавливается расписание по умолчанию:
+    каждый день в 10:00 МСК, до 100 объявлений.
     """
-    body: dict = {
+    if schedule is None:
+        schedule = [
+            {
+                "rate": 100,
+                "weekdays": [0, 1, 2, 3, 4, 5, 6],
+                "time_slots": [10],
+            }
+        ]
+
+    body = {
         "agreement": True,
         "autoload_enabled": True,
-        "feeds_data": [{"url": feed_url}],
+        "feeds_data": [
+            {
+                "feed_name": feed_name,
+                "feed_url": feed_url,
+            }
+        ],
+        "report_email": report_email,
+        "schedule": schedule,
     }
-    if report_email:
-        body["report_email"] = report_email
 
     return await _request("POST", "/autoload/v2/profile", json=body)
 
@@ -84,6 +115,9 @@ async def get_categories() -> dict:
     """Получить дерево категорий Авито.
 
     GET /autoload/v1/user-docs/tree
+
+    Возвращает дерево вида:
+        {"categories": [{"name": "...", "slug": "...", "nested": [...]}]}
     """
     return await _request("GET", "/autoload/v1/user-docs/tree")
 
@@ -92,6 +126,12 @@ async def get_category_fields(category_slug: str) -> dict:
     """Получить обязательные и опциональные поля категории.
 
     GET /autoload/v1/user-docs/node/{slug}/fields
+
+    Args:
+        category_slug: slug категории из дерева (например "telefony")
+
+    Возвращает:
+        {"node": {"name": "...", "slug": "..."}, "fields": [...]}
     """
     return await _request(
         "GET", f"/autoload/v1/user-docs/node/{category_slug}/fields"
@@ -138,4 +178,28 @@ async def get_report_items(
     params = {"page": page, "per_page": per_page}
     return await _request(
         "GET", f"/autoload/v2/reports/{report_id}/items", params=params
+    )
+
+
+async def get_report_items_by_ids(ad_ids: str) -> dict:
+    """Получить данные по конкретным объявлениям в автозагрузке.
+
+    GET /autoload/v2/reports/items
+
+    Args:
+        ad_ids: строка с ID объявлений через запятую (до 100 шт.)
+                Это ID из XML-фида (тег <Id>), не Avito ID.
+    """
+    params = {"query": ad_ids}
+    return await _request("GET", "/autoload/v2/reports/items", params=params)
+
+
+async def get_report_fees(report_id: int, page: int = 1, per_page: int = 50) -> dict:
+    """Получить списания за объявления в конкретной выгрузке.
+
+    GET /autoload/v2/reports/{report_id}/items/fees
+    """
+    params = {"page": page, "per_page": per_page}
+    return await _request(
+        "GET", f"/autoload/v2/reports/{report_id}/items/fees", params=params
     )
