@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - Мои объявления - Авито</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #fff;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 24px;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .top-bar-left a {
+            color: #333;
+            font-size: 13px;
+        }
+
+        .top-bar-left .dropdown-arrow::after {
+            content: " \25BE";
+            font-size: 10px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .top-bar-right a {
+            color: #333;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-publish {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-publish::before {
+            content: "+";
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .icon-heart, .icon-bell {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #ff4053;
+            color: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #00aaff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Header / Navigation */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-bottom: 1px solid #eee;
+            gap: 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .logo-dots {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+            width: 24px;
+        }
+
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .logo-dot.green { background: #00c853; }
+        .logo-dot.blue { background: #00b0ff; }
+        .logo-dot.orange { background: #ff6d00; }
+        .logo-dot.purple { background: #aa00ff; }
+
+        .main-nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .main-nav a {
+            color: #333;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Main layout */
+        .main-layout {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            gap: 32px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            color: #fff;
+            position: relative;
+            background: linear-gradient(135deg, #a8d8a8, #6fbf6f);
+        }
+
+        .camera-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-align: left;
+        }
+
+        .profile-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .rating-number {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stars {
+            color: #ffb400;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .reviews-link {
+            color: #00aaff;
+            font-size: 14px;
+        }
+
+        .pro-banner {
+            background: #f3f0ff;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .pro-banner-text h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .pro-banner-text p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .pro-banner-arrow {
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* Sidebar menu */
+        .sidebar-menu {
+            margin-bottom: 16px;
+        }
+
+        .sidebar-menu-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            padding: 8px 0;
+        }
+
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 0;
+            color: #007bff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .sidebar-menu-item:hover {
+            text-decoration: underline;
+        }
+
+        .sidebar-menu-item.black {
+            color: #333;
+        }
+
+        .tag-new {
+            background: #ff4053;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .sidebar-divider {
+            border: none;
+            border-top: 1px solid #e0e0e0;
+            margin: 12px 0;
+        }
+
+        /* App download section */
+        .app-download {
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .app-download h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .app-download p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .app-download p a {
+            color: #333;
+            text-decoration: underline;
+        }
+
+        .app-store-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .app-store-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .app-store-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .app-store-icon.apple { background: #333; }
+        .app-store-icon.rustore { background: #0066ff; }
+        .app-store-icon.galaxy { background: #ff6f00; }
+        .app-store-icon.huawei { background: #c10d31; font-size: 10px; font-weight: 700; }
+
+        /* Content area */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .content-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Info cards */
+        .info-cards {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .info-card {
+            flex: 1;
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .info-card:hover {
+            background: #f0f0f0;
+        }
+
+        .info-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .info-card-icon.purple {
+            background: #ede7f6;
+            color: #7c4dff;
+        }
+
+        .info-card-icon.blue {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .info-card-icon.gray {
+            background: #f5f5f5;
+        }
+
+        .info-card-text strong {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .info-card-text span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .info-card .tag-new {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .info-card-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: #ddd;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .info-card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 24px;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 0;
+            font-size: 15px;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: #333;
+            font-weight: 700;
+        }
+
+        .tab.active::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #333;
+        }
+
+        .tab-count {
+            color: #999;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        /* Listing item */
+        .listing-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .listing-image {
+            width: 160px;
+            height: 120px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .listing-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-dots {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+        }
+
+        .image-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .image-dot.active {
+            background: #333;
+        }
+
+        .listing-info {
+            flex: 1;
+        }
+
+        .listing-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .listing-price {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .listing-stock {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .listing-delivery {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .delivery-icon {
+            font-size: 16px;
+        }
+
+        .listing-location {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .listing-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .listing-status {
+            font-size: 13px;
+            color: #ff4053;
+            font-weight: 500;
+        }
+
+        .listing-chats {
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-pay {
+            padding: 10px 20px;
+            border: 1px solid #007bff;
+            border-radius: 8px;
+            background: #fff;
+            color: #007bff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-pay:hover {
+            background: #f0f7ff;
+        }
+
+        .btn-more {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .listing-actions-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid #eee;
+            padding: 24px;
+            margin-top: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .footer-legal {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .footer-legal a {
+            color: #999;
+            text-decoration: underline;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .social-icon:hover {
+            background: #555;
+        }
+
+        /* Messages widget */
+        .messages-widget {
+            position: fixed;
+            bottom: 0;
+            right: 24px;
+            background: #fff;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 280px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .messages-widget span {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .messages-widget-arrow {
+            font-size: 18px;
+            transform: rotate(0deg);
+            transition: transform 0.2s;
+        }
+
+        /* SVG icons as inline */
+        .svg-icon {
+            display: inline-flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <a href="#" class="dropdown-arrow">Для бизнеса</a>
+            <a href="#">Карьера в Авито</a>
+            <a href="#">Помощь</a>
+            <a href="#" class="dropdown-arrow">Каталоги</a>
+            <a href="#">#яПомогаю</a>
+        </div>
+        <div class="top-bar-right">
+            <a href="#" class="btn-publish">Разместить объявление</a>
+            <a href="#" style="font-weight: 600;">
+                <span style="margin-right: 4px;">&#9776;</span> Мои объявления
+            </a>
+            <span class="icon-heart" style="cursor:pointer;">&#9825;</span>
+            <span class="icon-bell" style="cursor:pointer;">
+                &#128276;
+                <span class="badge">3</span>
+            </span>
+            <div class="user-avatar-small">A</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <a href="#" class="logo">
+            <span class="logo-dots">
+                <span class="logo-dot green"></span>
+                <span class="logo-dot blue"></span>
+                <span class="logo-dot orange"></span>
+                <span class="logo-dot purple"></span>
+            </span>
+            Avito
+        </a>
+        <nav class="main-nav">
+            <a href="#">Бизнес360</a>
+            <a href="#">Авто</a>
+            <a href="#">Недвижимость</a>
+            <a href="#">Работа</a>
+            <a href="#">Услуги</a>
+            <a href="#">Ещё</a>
+        </nav>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Profile -->
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    A
+                    <span class="camera-icon">&#128247;</span>
+                </div>
+            </div>
+            <div class="profile-name">Александра Бойченко</div>
+            <div class="profile-rating">
+                <span class="rating-number">5,0</span>
+                <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                <a href="#" class="reviews-link">2 отзыва</a>
+            </div>
+
+            <!-- Pro Banner -->
+            <div class="pro-banner">
+                <div class="pro-banner-text">
+                    <h4>Работайте как профи</h4>
+                    <p>Выведите своё дело на новый уровень</p>
+                </div>
+                <span class="pro-banner-arrow">&#10095;</span>
+            </div>
+
+            <!-- Menu -->
+            <div class="sidebar-menu">
+                <div class="sidebar-menu-title">Мои объявления</div>
+                <div class="sidebar-menu-item">Сравнение цен <span class="tag-new">Новое</span></div>
+                <div class="sidebar-menu-item">Заказы</div>
+                <div class="sidebar-menu-item">Мои отзывы</div>
+                <div class="sidebar-menu-item">Избранное</div>
+                <div class="sidebar-menu-item">Портал призов</div>
+                <div class="sidebar-menu-item">Приглашайте друзей</div>
+                <div class="sidebar-menu-item">Мои резюме</div>
+                <div class="sidebar-menu-item">Подработка <span class="tag-new">Новое</span></div>
+                <div class="sidebar-menu-item">Портфолио <span class="tag-new">Новое</span></div>
+                <div class="sidebar-menu-item black">Авито Аукцион</div>
+                <div class="sidebar-menu-item black">Гараж</div>
+            </div>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-menu">
+                <div class="sidebar-menu-item">Сообщения</div>
+                <div class="sidebar-menu-item">Уведомления</div>
+            </div>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-menu">
+                <div class="sidebar-menu-item">Кошелёк</div>
+                <div class="sidebar-menu-item">Платные услуги</div>
+                <div class="sidebar-menu-item">Для профессионалов</div>
+                <div class="sidebar-menu-item">Спецпредложения <span class="tag-new">Новое</span></div>
+                <div class="sidebar-menu-item">Рассылки</div>
+                <div class="sidebar-menu-item black">Уровень сервиса</div>
+            </div>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-menu">
+                <div class="sidebar-menu-item">Адреса</div>
+                <div class="sidebar-menu-item">Управление профилем</div>
+                <div class="sidebar-menu-item">Защита профиля</div>
+                <div class="sidebar-menu-item">Настройки</div>
+                <div class="sidebar-menu-item">Авито Доставка</div>
+            </div>
+
+            <!-- App Download -->
+            <div class="app-download">
+                <h3>Скачайте приложение</h3>
+                <p>Через удобный магазин или прямо с сайта: <a href="#">АРК-файл для Android</a>.</p>
+                <div class="app-store-list">
+                    <div class="app-store-item">
+                        <div class="app-store-icon apple">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.97 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                            </svg>
+                        </div>
+                        <span>App Store</span>
+                    </div>
+                    <div class="app-store-item">
+                        <div class="app-store-icon rustore">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                <rect x="6" y="4" width="12" height="16" rx="2" fill="white"/>
+                                <rect x="8" y="6" width="8" height="10" rx="1" fill="#0066ff"/>
+                            </svg>
+                        </div>
+                        <span>RuStore</span>
+                    </div>
+                    <div class="app-store-item">
+                        <div class="app-store-icon galaxy">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                <circle cx="12" cy="12" r="8" fill="white" opacity="0.3"/>
+                                <circle cx="12" cy="12" r="4" fill="white"/>
+                            </svg>
+                        </div>
+                        <span>Galaxy Store</span>
+                    </div>
+                    <div class="app-store-item">
+                        <div class="app-store-icon huawei">
+                            HUAWEI
+                        </div>
+                        <span>AppGallery</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <h1 class="content-title">Мои объявления</h1>
+
+            <!-- Info Cards -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-icon purple">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#7c4dff">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.89-8.9c-1.78-.59-2.64-.96-2.64-1.9 0-1.02 1.11-1.39 1.81-1.39 1.31 0 1.79.99 1.9 1.34l1.58-.67c-.15-.44-.82-1.91-2.66-2.23V5h-1.75v1.26c-2.6.56-2.62 2.85-2.62 2.96 0 2.27 2.25 2.91 3.35 3.31 1.58.56 2.28 1.07 2.28 2.03 0 1.13-1.05 1.61-1.98 1.61-1.82 0-2.34-1.87-2.4-2.09l-1.66.67c.63 2.19 2.28 2.78 3.02 2.96V19h1.75v-1.24c.52-.09 3.02-.59 3.02-3.22 0-1.39-.6-2.61-3-3.44z"/>
+                        </svg>
+                    </div>
+                    <div class="info-card-text">
+                        <strong>32 420 &#8381;</strong>
+                        <span>принесли продажи на Авито</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon blue">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#2196f3">
+                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                        </svg>
+                    </div>
+                    <div class="info-card-text">
+                        <strong>Скидки и акции</strong>
+                        <span>настройте для покупателей</span>
+                    </div>
+                    <span class="tag-new">Новое</span>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-thumb">
+                        <div style="width:100%;height:100%;background:linear-gradient(135deg,#e0e0e0,#bdbdbd);display:flex;align-items:center;justify-content:center;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#999"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        </div>
+                    </div>
+                    <div class="info-card-text">
+                        <strong>Можно продать быстрее</strong>
+                        <span>нейросеть собрала советы для 1 товара</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active">Ждут действий<span class="tab-count">1</span></div>
+                <div class="tab">Активные<span class="tab-count">2</span></div>
+                <div class="tab">Архив<span class="tab-count">8</span></div>
+            </div>
+
+            <!-- Listing -->
+            <div class="listing-item">
+                <div class="listing-image">
+                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#d4d4d4,#a0a0a0);display:flex;align-items:center;justify-content:center;">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="#888">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    </div>
+                    <div class="image-dots">
+                        <span class="image-dot active"></span>
+                        <span class="image-dot"></span>
+                        <span class="image-dot"></span>
+                        <span class="image-dot"></span>
+                    </div>
+                </div>
+                <div class="listing-info">
+                    <div class="listing-title">Фара правая Skoda Octavia Tour с птф 2004-2010</div>
+                    <div class="listing-price">5 000 &#8381;</div>
+                    <div class="listing-stock">1 шт. в наличии</div>
+                    <div class="listing-delivery">
+                        <span class="delivery-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#333">
+                                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                            </svg>
+                        </span>
+                        Авито доставка
+                    </div>
+                    <div class="listing-location">Ярославская обл., Ярославль, пр-т Ленина, 37/73<br>р-н Ленинский</div>
+                </div>
+                <div class="listing-actions">
+                    <div class="listing-status">Не оплачено</div>
+                    <div class="listing-chats">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#999">
+                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                        </svg>
+                        Нет новых чатов
+                    </div>
+                    <div class="listing-actions-row">
+                        <button class="btn-pay">Оплатить размещение</button>
+                        <button class="btn-more">&#8943;</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">Помощь</a>
+            <a href="#">Безопасность</a>
+            <a href="#">Реклама на сайте</a>
+            <a href="#">О компании</a>
+            <a href="#">Карьера</a>
+            <a href="#">Авито Журнал</a>
+            <a href="#">Блог</a>
+            <a href="#">#яПомогаю</a>
+            <a href="#">Приложение</a>
+            <a href="#">Ещё &#9662;</a>
+        </div>
+        <div class="footer-legal">
+            Авито &mdash; <a href="#">сайт объявлений России</a>. &copy; ООО &laquo;КЕХ еКоммерц&raquo; 2007&ndash;2026. <a href="#">Правила Авито</a>.<br>
+            <a href="#">Политика конфиденциальности</a>. Оплачивая услуги на Авито, вы принимаете <a href="#">оферту</a>.<br>
+            Авито использует <a href="#">рекомендательные технологии</a>.
+        </div>
+        <div class="footer-social">
+            <div class="social-icon" title="ВКонтакте">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.391 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4.03 8.57 4.03 8.096c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.678.864 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.204.17-.407.44-.407h2.744c.373 0 .508.203.508.644v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.253-1.406 2.151-3.574 2.151-3.574.119-.254.322-.491.763-.491h1.744c.525 0 .644.27.525.644-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49-.085.744-.576.744z"/>
+                </svg>
+            </div>
+            <div class="social-icon" title="Одноклассники">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.8a3.6 3.6 0 110 7.2 3.6 3.6 0 010-7.2zm4.788 8.64a6.6 6.6 0 01-2.508 1.02l2.34 2.34a1.2 1.2 0 01-1.692 1.692L12 15.564l-2.928 2.928a1.2 1.2 0 01-1.692-1.692l2.34-2.34a6.6 6.6 0 01-2.508-1.02 1.2 1.2 0 011.356-1.98A4.2 4.2 0 0012 12.6a4.2 4.2 0 003.432-1.14 1.2 1.2 0 011.356 1.98z"/>
+                </svg>
+            </div>
+            <div class="social-icon" title="Telegram">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.96 6.504-1.36 8.627-.168.9-.5 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+            </div>
+            <div class="social-icon" title="Rutube">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm3 12.5H9v4h-2.5v-9H15a2.5 2.5 0 010 5z"/>
+                    <circle cx="15" cy="10" r="1" fill="white"/>
+                </svg>
+            </div>
+            <div class="social-icon" title="Дзен">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 19.2c-3.976 0-7.2-3.224-7.2-7.2S8.024 4.8 12 4.8s7.2 3.224 7.2 7.2-3.224 7.2-7.2 7.2z"/>
+                </svg>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Messages Widget -->
+    <div class="messages-widget">
+        <span>Сообщения</span>
+        <span class="messages-widget-arrow">&#9650;</span>
+    </div>
+
+</body>
+</html>
