@@ -395,7 +395,7 @@
             flex: 1;
             background: #f7f7f7;
             border-radius: 12px;
-            padding: 16px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -408,14 +408,37 @@
         }
 
         .info-card-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .info-card-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-img {
+            height: 36px;
+        }
+
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-icon-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
         }
 
         .info-card-icon.purple {
@@ -749,10 +772,18 @@
             <a href="#" style="font-weight: 600;">
                 <span style="margin-right: 4px;">&#9776;</span> Мои объявления
             </a>
-            <span class="icon-heart" style="cursor:pointer;">&#9825;</span>
-            <span class="icon-bell" style="cursor:pointer;">
-                &#128276;
+            <span class="header-icon-wrapper">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="#c0c0c0"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </span>
+            <span class="header-icon-wrapper">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="#c0c0c0"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                 <span class="badge">3</span>
+            </span>
+            <span class="header-icon-wrapper">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="#c0c0c0"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            </span>
+            <span class="header-icon-wrapper">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="#c0c0c0"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0020.42 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
             </span>
             <div class="user-avatar-small">A</div>
         </div>
@@ -761,13 +792,7 @@
     <!-- Header -->
     <div class="header">
         <a href="#" class="logo">
-            <span class="logo-dots">
-                <span class="logo-dot green"></span>
-                <span class="logo-dot blue"></span>
-                <span class="logo-dot orange"></span>
-                <span class="logo-dot purple"></span>
-            </span>
-            Avito
+            <img src="images/avito-logo.png" alt="Avito" class="logo-img">
         </a>
         <nav class="main-nav">
             <a href="#">Бизнес360</a>
@@ -795,15 +820,6 @@
                 <span class="rating-number">5,0</span>
                 <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
                 <a href="#" class="reviews-link">2 отзыва</a>
-            </div>
-
-            <!-- Pro Banner -->
-            <div class="pro-banner">
-                <div class="pro-banner-text">
-                    <h4>Работайте как профи</h4>
-                    <p>Выведите своё дело на новый уровень</p>
-                </div>
-                <span class="pro-banner-arrow">&#10095;</span>
             </div>
 
             <!-- Menu -->
@@ -898,10 +914,8 @@
             <!-- Info Cards -->
             <div class="info-cards">
                 <div class="info-card">
-                    <div class="info-card-icon purple">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#7c4dff">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.89-8.9c-1.78-.59-2.64-.96-2.64-1.9 0-1.02 1.11-1.39 1.81-1.39 1.31 0 1.79.99 1.9 1.34l1.58-.67c-.15-.44-.82-1.91-2.66-2.23V5h-1.75v1.26c-2.6.56-2.62 2.85-2.62 2.96 0 2.27 2.25 2.91 3.35 3.31 1.58.56 2.28 1.07 2.28 2.03 0 1.13-1.05 1.61-1.98 1.61-1.82 0-2.34-1.87-2.4-2.09l-1.66.67c.63 2.19 2.28 2.78 3.02 2.96V19h1.75v-1.24c.52-.09 3.02-.59 3.02-3.22 0-1.39-.6-2.61-3-3.44z"/>
-                        </svg>
+                    <div class="info-card-icon">
+                        <img src="images/icon-sales.png" alt="Продажи">
                     </div>
                     <div class="info-card-text">
                         <strong>32 420 &#8381;</strong>
@@ -909,27 +923,14 @@
                     </div>
                 </div>
                 <div class="info-card">
-                    <div class="info-card-icon blue">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="#2196f3">
-                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
-                        </svg>
+                    <div class="info-card-icon">
+                        <img src="images/icon-discounts.png" alt="Скидки">
                     </div>
                     <div class="info-card-text">
                         <strong>Скидки и акции</strong>
                         <span>настройте для покупателей</span>
                     </div>
                     <span class="tag-new">Новое</span>
-                </div>
-                <div class="info-card">
-                    <div class="info-card-thumb">
-                        <div style="width:100%;height:100%;background:linear-gradient(135deg,#e0e0e0,#bdbdbd);display:flex;align-items:center;justify-content:center;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#999"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                        </div>
-                    </div>
-                    <div class="info-card-text">
-                        <strong>Можно продать быстрее</strong>
-                        <span>нейросеть собрала советы для 1 товара</span>
-                    </div>
                 </div>
             </div>
 
