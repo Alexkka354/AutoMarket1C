@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from integration_module.client import get_products, force_sync
+from integration_module.client import get_products, force_sync, publish_to_avito
 
 router = Router()
 
@@ -40,12 +40,24 @@ async def select_platform(callback: CallbackQuery, state: FSMContext):
         sync_result = await force_sync()
         if sync_result.get("status") == "ok":
             synced = sync_result.get("synced", 0)
-            await callback.message.answer(
-                f"✅ Синхронизация завершена!\n\n"
-                f"📦 Загружено товаров: {synced}\n"
-                f"🏪 Площадка: {platform}\n\n"
-                f"Теперь можно публиковать товары."
-            )
+
+            if callback.data == "platform_avito" or callback.data == "platform_all":
+                publish_result = await publish_to_avito()
+                published = publish_result.get("published", 0)
+                await callback.message.answer(
+                    f"✅ Синхронизация завершена!\n\n"
+                    f"📦 Загружено товаров: {synced}\n"
+                    f"🏪 Площадка: {platform}\n"
+                    f"📌 Опубликовано на Авито: {published}\n\n"
+                    f"Товары доступны на странице Авито."
+                )
+            else:
+                await callback.message.answer(
+                    f"✅ Синхронизация завершена!\n\n"
+                    f"📦 Загружено товаров: {synced}\n"
+                    f"🏪 Площадка: {platform}\n\n"
+                    f"Теперь можно публиковать товары."
+                )
         else:
             await callback.message.answer(
                 f"⚠️ Синхронизация недоступна — адаптер 1С не запущен.\n"

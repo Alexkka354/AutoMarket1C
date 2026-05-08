@@ -941,47 +941,10 @@
                 <div class="tab">Архив<span class="tab-count">8</span></div>
             </div>
 
-            <!-- Listing -->
-            <div class="listing-item">
-                <div class="listing-image">
-                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#d4d4d4,#a0a0a0);display:flex;align-items:center;justify-content:center;">
-                        <svg width="60" height="60" viewBox="0 0 24 24" fill="#888">
-                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                        </svg>
-                    </div>
-                    <div class="image-dots">
-                        <span class="image-dot active"></span>
-                        <span class="image-dot"></span>
-                        <span class="image-dot"></span>
-                        <span class="image-dot"></span>
-                    </div>
-                </div>
-                <div class="listing-info">
-                    <div class="listing-title">Фара правая Skoda Octavia Tour с птф 2004-2010</div>
-                    <div class="listing-price">5 000 &#8381;</div>
-                    <div class="listing-stock">1 шт. в наличии</div>
-                    <div class="listing-delivery">
-                        <span class="delivery-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#333">
-                                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-                            </svg>
-                        </span>
-                        Авито доставка
-                    </div>
-                    <div class="listing-location">Ярославская обл., Ярославль, пр-т Ленина, 37/73<br>р-н Ленинский</div>
-                </div>
-                <div class="listing-actions">
-                    <div class="listing-status">Не оплачено</div>
-                    <div class="listing-chats">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#999">
-                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-                        </svg>
-                        Нет новых чатов
-                    </div>
-                    <div class="listing-actions-row">
-                        <button class="btn-pay">Оплатить размещение</button>
-                        <button class="btn-more">&#8943;</button>
-                    </div>
+            <!-- Listings container (dynamically loaded from API) -->
+            <div id="listings-container">
+                <div id="listings-loading" style="text-align:center;padding:40px;color:#999;">
+                    Загрузка объявлений...
                 </div>
             </div>
         </main>
@@ -1031,5 +994,94 @@
         <span class="messages-widget-arrow">&#9650;</span>
     </div>
 
+<script>
+    const API_URL = 'http://localhost:8000';
+
+    function formatPrice(price) {
+        return Number(price).toLocaleString('ru-RU') + ' \u20BD';
+    }
+
+    function createListingHTML(product) {
+        const imageBlock = product.image_url
+            ? `<img src="${product.image_url}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;">`
+            : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#d4d4d4,#a0a0a0);display:flex;align-items:center;justify-content:center;">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="#888">
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                </svg>
+               </div>`;
+
+        return `
+            <div class="listing-item">
+                <div class="listing-image">
+                    ${imageBlock}
+                </div>
+                <div class="listing-info">
+                    <div class="listing-title">${product.name}</div>
+                    <div class="listing-price">${formatPrice(product.price)}</div>
+                    <div class="listing-stock">${product.stock} шт. в наличии</div>
+                    ${product.description ? `<div class="listing-description" style="font-size:13px;color:#666;margin-top:4px;">${product.description}</div>` : ''}
+                    ${product.category ? `<div style="font-size:12px;color:#999;margin-top:4px;">Категория: ${product.category}</div>` : ''}
+                </div>
+                <div class="listing-actions">
+                    <div class="listing-status" style="color:green;">Опубликовано</div>
+                    <div class="listing-chats">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#999">
+                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                        </svg>
+                        Нет новых чатов
+                    </div>
+                    <div class="listing-actions-row">
+                        <button class="btn-pay">Редактировать</button>
+                        <button class="btn-more">&#8943;</button>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    async function loadListings() {
+        const container = document.getElementById('listings-container');
+        try {
+            const response = await fetch(API_URL + '/avito/products');
+            if (!response.ok) throw new Error('API недоступен');
+            const products = await response.json();
+
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:#999;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="#ccc" style="margin-bottom:12px;">
+                            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                        </svg>
+                        <div>Нет объявлений для отображения</div>
+                        <div style="font-size:13px;margin-top:8px;">Нажмите «Выгрузить на Авито» в Telegram-боте, чтобы опубликовать товары</div>
+                    </div>`;
+                updateTabCounts(0);
+                return;
+            }
+
+            container.innerHTML = products.map(createListingHTML).join('');
+            updateTabCounts(products.length);
+        } catch (err) {
+            container.innerHTML = `
+                <div style="text-align:center;padding:40px;color:#999;">
+                    <div style="font-size:16px;margin-bottom:8px;">Не удалось загрузить объявления</div>
+                    <div style="font-size:13px;">Убедитесь что интеграционный модуль запущен на ${API_URL}</div>
+                    <button onclick="loadListings()" style="margin-top:12px;padding:8px 16px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer;">Повторить</button>
+                </div>`;
+        }
+    }
+
+    function updateTabCounts(activeCount) {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            if (tab.textContent.includes('Активные')) {
+                const countEl = tab.querySelector('.tab-count');
+                if (countEl) countEl.textContent = activeCount;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadListings);
+    setInterval(loadListings, 30000);
+</script>
 </body>
 </html>
