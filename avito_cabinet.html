@@ -716,17 +716,25 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #333;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             font-size: 18px;
             cursor: pointer;
+            overflow: hidden;
+            padding: 0;
         }
 
         .social-icon:hover {
-            background: #555;
+            opacity: 0.8;
+        }
+
+        .social-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Messages widget */
@@ -1000,19 +1008,19 @@
         </div>
         <div class="footer-social">
             <div class="social-icon" title="ВКонтакте">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.391 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4.03 8.57 4.03 8.096c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.678.864 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.204.17-.407.44-.407h2.744c.373 0 .508.203.508.644v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.253-1.406 2.151-3.574 2.151-3.574.119-.254.322-.491.763-.491h1.744c.525 0 .644.27.525.644-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.05.17.49-.085.744-.576.744z"/></svg>
+                <img src="images/social-vk.png" alt="VK" class="social-img">
             </div>
             <div class="social-icon" title="Одноклассники">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M14.505 17.44a11.5 11.5 0 002.89-1.27 1.35 1.35 0 00-1.455-2.274 8.86 8.86 0 01-3.94 1.104 8.86 8.86 0 01-3.94-1.104 1.35 1.35 0 00-1.455 2.274c.91.583 1.88 1.005 2.89 1.27l-2.75 2.75a1.35 1.35 0 001.91 1.91L12 19.75l3.345 3.35a1.35 1.35 0 001.91-1.91l-2.75-2.75zM12 .9a5.1 5.1 0 105.1 5.1A5.1 5.1 0 0012 .9zm0 7.5a2.4 2.4 0 112.4-2.4 2.4 2.4 0 01-2.4 2.4z"/></svg>
+                <img src="images/social-ok.png" alt="OK" class="social-img">
             </div>
             <div class="social-icon" title="Telegram">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
+                <img src="images/social-telegram.png" alt="Telegram" class="social-img">
             </div>
             <div class="social-icon" title="Rutube">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.5 10.5H10v4H7.5v-9H14.5a2.5 2.5 0 010 5z"/></svg>
+                <img src="images/social-rutube.png" alt="Rutube" class="social-img">
             </div>
             <div class="social-icon" title="Дзен">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm-.3 21.5c-2.7-.3-4.5-2-5.8-4.2C4.7 15 4.3 12.2 5 9.5c.8-3 2.8-5.2 5.8-6.3.5-.2 1-.3 1.5-.3 2.7.3 4.5 2 5.8 4.2 1.2 2.3 1.6 5.1.9 7.8-.8 3-2.8 5.2-5.8 6.3-.5.2-1 .3-1.5.3z"/></svg>
+                <img src="images/social-dzen.png" alt="Дзен" class="social-img">
             </div>
         </div>
     </footer>
