@@ -49,6 +49,15 @@ async def publish_to_avito(product_ids: list = None) -> dict:
             return {"status": "error"}
 
 
+async def unpublish_from_avito(product_ids: list = None) -> dict:
+    async with aiohttp.ClientSession() as session:
+        payload = {"product_ids": product_ids} if product_ids else {}
+        async with session.post(f"{INTEGRATION_URL}/avito/unpublish", json=payload) as resp:
+            if resp.status == 200:
+                return await resp.json()
+            return {"status": "error"}
+
+
 async def get_avito_products() -> list:
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{INTEGRATION_URL}/avito/products") as resp:

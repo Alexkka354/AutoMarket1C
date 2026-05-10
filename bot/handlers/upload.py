@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from integration_module.client import get_products, publish_to_avito, update_product
+from integration_module.client import get_products, publish_to_avito, unpublish_from_avito, update_product
 from content.generator import generate_description, classify_category
 from content.image_search import search_product_image
 from vk.market import add_product
@@ -24,6 +24,7 @@ def platform_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="📌 Авито",        callback_data="platform_avito")],
         [InlineKeyboardButton(text="📘 ВКонтакте",    callback_data="platform_vk")],
         [InlineKeyboardButton(text="🌐 Все площадки", callback_data="platform_all")],
+        [InlineKeyboardButton(text="❌ Снять с публикации Авито", callback_data="unpublish_avito")],
     ])
 
 
@@ -221,6 +222,31 @@ async def select_platform(callback: CallbackQuery, state: FSMContext):
         logger.error(f"Ошибка выгрузки: {e}")
         await callback.message.answer(
             f"⚠️ Ошибка при выгрузке: {str(e)}"
+        )
+
+
+@router.callback_query(lambda c: c.data == "unpublish_avito")
+async def unpublish_avito(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await callback.message.answer("⏳ Снимаю товары с публикации на Авито...")
+
+    try:
+        result = await unpublish_from_avito()
+        unpublished = result.get("unpublished", 0)
+
+        if unpublished > 0:
+            await callback.message.answer(
+                f"✅ Снято с публикации: {unpublished} товаров\n"
+                f"🌐 Страница Авито обновится автоматически."
+            )
+        else:
+            await callback.message.answer(
+                "ℹ️ Нет опубликованных товаров на Авито."
+            )
+    except Exception as e:
+        logger.error(f"Ошибка снятия с публикации: {e}")
+        await callback.message.answer(
+            f"⚠️ Ошибка при снятии с публикации: {str(e)}"
         )
 
 
