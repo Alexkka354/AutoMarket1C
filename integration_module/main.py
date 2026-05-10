@@ -6,6 +6,12 @@ from integration_module import database
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 
+
+class ProductUpdate(BaseModel):
+    description: Optional[str] = None
+    image_url:   Optional[str] = None
+    category:    Optional[str] = None
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await database.create_products_table()
@@ -25,6 +31,7 @@ app.add_middleware(
 
 class PublishRequest(BaseModel):
     product_ids: Optional[List[int]] = None
+
 
 @app.get("/health")
 async def health():
@@ -57,6 +64,21 @@ async def get_product(product_id: int):
     if not product:
         raise HTTPException(status_code=404, detail="Товар не найден")
     return product
+
+
+@app.patch("/products/{product_id}")
+async def patch_product(product_id: int, update: ProductUpdate):
+    try:
+        await database.update_product(
+            product_id,
+            description=update.description,
+            image_url=update.image_url,
+            category=update.category
+        )
+        return {"status": "ok", "updated": product_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/avito/publish")
 async def avito_publish(request: PublishRequest = None):

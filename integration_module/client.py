@@ -22,6 +22,24 @@ async def force_sync() -> dict:
                 return await resp.json()
             return {"status": "error"}
 
+async def update_product(product_id: int, description: str = None,
+                         image_url: str = None, category: str = None) -> dict:
+    async with aiohttp.ClientSession() as session:
+        payload = {}
+        if description is not None:
+            payload["description"] = description
+        if image_url is not None:
+            payload["image_url"] = image_url
+        if category is not None:
+            payload["category"] = category
+        async with session.patch(
+            f"{INTEGRATION_URL}/products/{product_id}", json=payload
+        ) as resp:
+            if resp.status == 200:
+                return await resp.json()
+            return {"status": "error"}
+
+
 async def publish_to_avito(product_ids: list = None) -> dict:
     async with aiohttp.ClientSession() as session:
         payload = {"product_ids": product_ids} if product_ids else {}

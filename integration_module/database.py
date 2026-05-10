@@ -85,6 +85,20 @@ async def get_product_by_id(product_id: int) -> Optional[dict]:
     await conn.close()
     return dict(row) if row else None
 
+async def update_product(product_id: int, description: str = None,
+                         image_url: str = None, category: str = None):
+    conn = await get_connection()
+    await conn.execute("""
+        UPDATE products
+        SET description = COALESCE($1, description),
+            image_url   = COALESCE($2, image_url),
+            category    = COALESCE($3, category),
+            updated_at  = NOW()
+        WHERE id = $4
+    """, description, image_url, category, product_id)
+    await conn.close()
+
+
 async def publish_to_avito(product_ids: list = None) -> int:
     conn = await get_connection()
     if product_ids:
