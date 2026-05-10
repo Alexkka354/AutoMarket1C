@@ -584,8 +584,16 @@
         .listing-title {
             font-size: 18px;
             font-weight: 700;
-            color: #333;
             margin-bottom: 6px;
+        }
+
+        .listing-title a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .listing-title a:hover {
+            color: #c44;
         }
 
         .listing-price {
@@ -936,8 +944,8 @@
 
             <!-- Tabs -->
             <div class="tabs">
-                <div class="tab active">Ждут действий<span class="tab-count">1</span></div>
-                <div class="tab">Активные<span class="tab-count">2</span></div>
+                <div class="tab">Ждут действий<span class="tab-count">1</span></div>
+                <div class="tab active">Активные<span class="tab-count">2</span></div>
                 <div class="tab">Архив<span class="tab-count">8</span></div>
             </div>
 
@@ -1016,7 +1024,7 @@
                     ${imageBlock}
                 </div>
                 <div class="listing-info">
-                    <div class="listing-title">${product.name}</div>
+                    <div class="listing-title"><a href="avito_product.html?id=${product.id}">${product.name}</a></div>
                     <div class="listing-price">${formatPrice(product.price)}</div>
                     <div class="listing-stock">${product.stock} шт. в наличии</div>
                     ${product.description ? `<div class="listing-description" style="font-size:13px;color:#666;margin-top:4px;">${product.description}</div>` : ''}
