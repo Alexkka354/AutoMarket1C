@@ -1,7 +1,9 @@
 """
 Модуль поиска фото товара по названию.
-Использует Yandex Картинки (поиск в интернете) для поиска
-реальных фотографий товаров — телефонов, наушников и т.д.
+
+Использует Yandex Картинки для поиска кандидатов-изображений,
+затем ранжирует их через модель CLIP ViT-B/32 и отбирает лучшее
+по итоговому ранговому баллу R(I).
 
 Не требует API-ключа, работает из России без VPN.
 """
@@ -9,7 +11,24 @@
 import aiohttp
 import html
 import re
+import logging
 from urllib.parse import quote_plus
+
+logger = logging.getLogger(__name__)
+
+# CLIP — опциональная зависимость; бот работает и без torch
+try:
+    from content.clip_ranker import (
+        get_clip_ranker,
+        R_THRESHOLD,
+        R_VERIFICATION_ZONE,
+    )
+    _CLIP_AVAILABLE = True
+except ImportError:
+    logger.warning("torch / open_clip не установлены — CLIP-ранжирование отключено")
+    _CLIP_AVAILABLE = False
+    R_THRESHOLD = 0.45
+    R_VERIFICATION_ZONE = 0.60
 
 YANDEX_URL = "https://yandex.ru/images/search"
 
@@ -44,11 +63,11 @@ async def search_yandex_images(query: str, max_results: int = 10) -> list[str]:
                 YANDEX_URL, params=params, headers=headers, timeout=15
             ) as resp:
                 if resp.status != 200:
-                    print(f"⚠ Yandex вернул статус {resp.status}")
+                    logger.warning("Yandex вернул статус %s", resp.status)
                     return []
                 html_text = await resp.text()
     except Exception as e:
-        print(f"⚠ Ошибка запроса к Yandex: {e}")
+        logger.warning("Ошибка запроса к Yandex: %s", e)
         return []
 
     # Декодируем HTML-сущности (&quot; -> ", &amp; -> & и т.д.)
@@ -72,21 +91,83 @@ async def search_yandex_images(query: str, max_results: int = 10) -> list[str]:
 async def search_product_image(product_name: str, max_results: int = 5) -> dict:
     """
     Главная функция модуля.
-    Ищет фото товара через Яндекс.Картинки.
+
+    1. Ищет фото-кандидаты через Яндекс.Картинки
+    2. Ранжирует их через CLIP ViT-B/32
+    3. Возвращает лучшее изображение со статусом
 
     Возвращает словарь:
     {
-        "urls": ["https://...", ...],   # список найденных фото
-        "query_used": "Samsung Galaxy A54",
-        "source": "yandex.ru/images"
+        "best_url":        str | None,   # URL лучшего изображения
+        "best_score":      float,        # итоговый ранговый балл R(I*)
+        "status":          str,          # "accepted" / "needs_verification" / "no_match"
+        "all_candidates":  list[dict],   # все ранжированные кандидаты
+        "urls":            list[str],    # обратная совместимость — список URL
+        "query_used":      str,
+        "source":          str
     }
     """
-    print(f"🔍 Ищу фото в Яндекс.Картинках: {product_name}")
+    logger.info("Ищу фото: %s", product_name)
 
-    urls = await search_yandex_images(product_name, max_results=max_results)
+    # Шаг 1: поиск кандидатов через Яндекс (берём больше для отбора)
+    search_count = max_results * 3
+    urls = await search_yandex_images(product_name, max_results=search_count)
+
+    empty_result = {
+        "best_url": None,
+        "best_score": 0,
+        "status": "no_match",
+        "all_candidates": [],
+        "urls": [],
+        "query_used": product_name,
+        "source": "yandex.ru/images + CLIP ViT-B/32",
+    }
+
+    if not urls:
+        return empty_result
+
+    # Если CLIP недоступен — возвращаем первый URL без ранжирования
+    if not _CLIP_AVAILABLE:
+        return {
+            "best_url": urls[0] if urls else None,
+            "best_score": 0,
+            "status": "no_match",
+            "all_candidates": [],
+            "urls": urls[:max_results],
+            "query_used": product_name,
+            "source": "yandex.ru/images (CLIP не установлен)",
+        }
+
+    # Шаг 2: ранжирование через CLIP
+    try:
+        ranker = get_clip_ranker()
+        ranked = await ranker.rank_images(product_name, urls)
+    except Exception as exc:
+        logger.error("Ошибка CLIP-ранжирования: %s", exc)
+        # Fallback: возвращаем URL без ранжирования (как раньше)
+        return {
+            "best_url": urls[0] if urls else None,
+            "best_score": 0,
+            "status": "no_match",
+            "all_candidates": [],
+            "urls": urls[:max_results],
+            "query_used": product_name,
+            "source": "yandex.ru/images (CLIP недоступен)",
+        }
+
+    if not ranked:
+        return empty_result
+
+    # Шаг 3: выбор лучшего — формула (20)
+    best = ranked[0]
+    best_url = best["url"] if best["rank_score"] >= R_THRESHOLD else None
 
     return {
-        "urls": urls,
+        "best_url": best_url,
+        "best_score": best["rank_score"],
+        "status": best["status"],
+        "all_candidates": ranked[:max_results],
+        "urls": [r["url"] for r in ranked[:max_results]],
         "query_used": product_name,
-        "source": "yandex.ru/images",
+        "source": "yandex.ru/images + CLIP ViT-B/32",
     }

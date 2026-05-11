@@ -1,8 +1,16 @@
 from fastapi import FastAPI, HTTPException
-from typing import List
+from fastapi.middleware.cors import CORSMiddleware
+from typing import List, Optional
 from integration_module.models import ProductSync
 from integration_module import database
 from contextlib import asynccontextmanager
+from pydantic import BaseModel
+
+
+class ProductUpdate(BaseModel):
+    description: Optional[str] = None
+    image_url:   Optional[str] = None
+    category:    Optional[str] = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -11,6 +19,19 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="AutoMarket Integration Module", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class PublishRequest(BaseModel):
+    product_ids: Optional[List[int]] = None
+
 
 @app.get("/health")
 async def health():
@@ -43,6 +64,58 @@ async def get_product(product_id: int):
     if not product:
         raise HTTPException(status_code=404, detail="Товар не найден")
     return product
+
+
+@app.patch("/products/{product_id}")
+async def patch_product(product_id: int, update: ProductUpdate):
+    try:
+        await database.update_product(
+            product_id,
+            description=update.description,
+            image_url=update.image_url,
+            category=update.category
+        )
+        return {"status": "ok", "updated": product_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/avito/publish")
+async def avito_publish(request: PublishRequest = None):
+    try:
+        ids = request.product_ids if request else None
+        count = await database.publish_to_avito(ids)
+        return {
+            "status": "ok",
+            "published": count,
+            "message": f"Опубликовано {count} товаров на Авито"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/avito/unpublish")
+async def avito_unpublish(request: PublishRequest = None):
+    try:
+        ids = request.product_ids if request else None
+        count = await database.unpublish_from_avito(ids)
+        return {
+            "status": "ok",
+            "unpublished": count,
+            "message": f"Снято с публикации {count} товаров"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/avito/products")
+async def avito_products():
+    try:
+        products = await database.get_avito_products()
+        return products
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/sync/start")
 async def sync_start():

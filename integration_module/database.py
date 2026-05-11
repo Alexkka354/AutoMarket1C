@@ -33,9 +33,21 @@ async def create_products_table():
             description TEXT,
             image_url   VARCHAR(500),
             status      VARCHAR(50) DEFAULT 'active',
+            published_avito BOOLEAN DEFAULT FALSE,
             created_at  TIMESTAMP DEFAULT NOW(),
             updated_at  TIMESTAMP DEFAULT NOW()
         )
+    """)
+    await conn.execute("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name = 'products' AND column_name = 'published_avito'
+            ) THEN
+                ALTER TABLE products ADD COLUMN published_avito BOOLEAN DEFAULT FALSE;
+            END IF;
+        END $$;
     """)
     await conn.close()
 
@@ -72,6 +84,73 @@ async def get_product_by_id(product_id: int) -> Optional[dict]:
     row = await conn.fetchrow("SELECT * FROM products WHERE id = $1", product_id)
     await conn.close()
     return dict(row) if row else None
+
+async def update_product(product_id: int, description: str = None,
+                         image_url: str = None, category: str = None):
+    conn = await get_connection()
+    await conn.execute("""
+        UPDATE products
+        SET description = COALESCE($1, description),
+            image_url   = COALESCE($2, image_url),
+            category    = COALESCE($3, category),
+            updated_at  = NOW()
+        WHERE id = $4
+    """, description, image_url, category, product_id)
+    await conn.close()
+
+
+async def publish_to_avito(product_ids: list = None) -> int:
+    conn = await get_connection()
+    if product_ids:
+        count = await conn.fetchval("""
+            UPDATE products SET published_avito = TRUE, updated_at = NOW()
+            WHERE id = ANY($1::int[]) AND status = 'active'
+            RETURNING COUNT(*)
+        """, product_ids)
+    else:
+        count = await conn.fetchval("""
+            WITH updated AS (
+                UPDATE products SET published_avito = TRUE, updated_at = NOW()
+                WHERE status = 'active' AND published_avito = FALSE
+                RETURNING 1
+            ) SELECT COUNT(*) FROM updated
+        """)
+    await conn.close()
+    return count or 0
+
+
+async def unpublish_from_avito(product_ids: list = None) -> int:
+    conn = await get_connection()
+    if product_ids:
+        count = await conn.fetchval("""
+            WITH updated AS (
+                UPDATE products SET published_avito = FALSE, updated_at = NOW()
+                WHERE id = ANY($1::int[])
+                RETURNING 1
+            ) SELECT COUNT(*) FROM updated
+        """, product_ids)
+    else:
+        count = await conn.fetchval("""
+            WITH updated AS (
+                UPDATE products SET published_avito = FALSE, updated_at = NOW()
+                WHERE published_avito = TRUE
+                RETURNING 1
+            ) SELECT COUNT(*) FROM updated
+        """)
+    await conn.close()
+    return count or 0
+
+
+async def get_avito_products() -> list:
+    conn = await get_connection()
+    rows = await conn.fetch("""
+        SELECT * FROM products
+        WHERE published_avito = TRUE AND status = 'active'
+        ORDER BY updated_at DESC
+    """)
+    await conn.close()
+    return [dict(row) for row in rows]
+
 
 async def get_stats() -> dict:
     conn = await get_connection()
