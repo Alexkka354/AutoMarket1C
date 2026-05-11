@@ -889,7 +889,7 @@
             <!-- Buttons -->
             <div class="product-buttons">
                 <button>Редактировать</button>
-                <button>Снять с публикации</button>
+                <button id="btn-unpublish" onclick="unpublishProduct()">Снять с публикации</button>
             </div>
 
             <!-- Stats + Sidebar Layout -->
@@ -1218,6 +1218,56 @@
                 <div style="font-size:13px;color:#999;">Убедитесь что интеграционный модуль запущен на ${API_URL}</div>
                 <button onclick="loadProduct()" style="margin-top:12px;padding:8px 16px;background:#2196f3;color:#fff;border:none;border-radius:6px;cursor:pointer;">Повторить</button>
             `;
+        }
+    }
+
+    async function unpublishProduct() {
+        const productId = getProductId();
+        if (!productId) return;
+
+        const btn = document.getElementById('btn-unpublish');
+        const originalText = btn.textContent;
+
+        if (!confirm('Вы уверены, что хотите снять это объявление с публикации?')) {
+            return;
+        }
+
+        btn.textContent = 'Снимаю...';
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+
+        try {
+            const response = await fetch(API_URL + '/avito/unpublish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_ids: [parseInt(productId)] })
+            });
+
+            if (!response.ok) throw new Error('Ошибка сервера');
+
+            const result = await response.json();
+            const count = result.unpublished || 0;
+
+            if (count > 0) {
+                btn.textContent = 'Снято с публикации';
+                btn.style.background = '#f5f5f5';
+                btn.style.color = '#999';
+                btn.style.cursor = 'default';
+
+                setTimeout(function() {
+                    window.location.href = 'avito_cabinet.html';
+                }, 1500);
+            } else {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                alert('Объявление не найдено или уже снято с публикации.');
+            }
+        } catch (err) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            alert('Ошибка при снятии с публикации: ' + err.message + '\n\nУбедитесь что сервер запущен на ' + API_URL);
         }
     }
 
