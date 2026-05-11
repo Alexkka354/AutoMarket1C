@@ -14,13 +14,21 @@ import re
 import logging
 from urllib.parse import quote_plus
 
-from content.clip_ranker import (
-    get_clip_ranker,
-    R_THRESHOLD,
-    R_VERIFICATION_ZONE,
-)
-
 logger = logging.getLogger(__name__)
+
+# CLIP — опциональная зависимость; бот работает и без torch
+try:
+    from content.clip_ranker import (
+        get_clip_ranker,
+        R_THRESHOLD,
+        R_VERIFICATION_ZONE,
+    )
+    _CLIP_AVAILABLE = True
+except ImportError:
+    logger.warning("torch / open_clip не установлены — CLIP-ранжирование отключено")
+    _CLIP_AVAILABLE = False
+    R_THRESHOLD = 0.45
+    R_VERIFICATION_ZONE = 0.60
 
 YANDEX_URL = "https://yandex.ru/images/search"
 
@@ -117,6 +125,18 @@ async def search_product_image(product_name: str, max_results: int = 5) -> dict:
 
     if not urls:
         return empty_result
+
+    # Если CLIP недоступен — возвращаем первый URL без ранжирования
+    if not _CLIP_AVAILABLE:
+        return {
+            "best_url": urls[0] if urls else None,
+            "best_score": 0,
+            "status": "no_match",
+            "all_candidates": [],
+            "urls": urls[:max_results],
+            "query_used": product_name,
+            "source": "yandex.ru/images (CLIP не установлен)",
+        }
 
     # Шаг 2: ранжирование через CLIP
     try:
