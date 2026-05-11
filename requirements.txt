@@ -6,3 +6,7 @@ uvicorn==0.30.1
 asyncpg==0.29.0
 sqlalchemy[asyncio]==2.0.30
 pydantic==2.7.4
+torch>=2.0.0
+torchvision>=0.15.0
+open-clip-torch>=2.24.0
+Pillow>=10.0.0

@@ -67,6 +67,7 @@ async def select_platform(callback: CallbackQuery, state: FSMContext):
         processed = 0
         failed    = 0
         no_image  = 0
+        needs_verification = []
 
         for product in products:
             try:
@@ -109,17 +110,38 @@ async def select_platform(callback: CallbackQuery, state: FSMContext):
                     except Exception as e:
                         logger.warning(f"Ошибка категоризации для {name}: {e}")
 
-                # Шаг 3 — ищем фото через Яндекс.Картинки
+                # Шаг 3 — ищем фото через Яндекс.Картинки + CLIP-ранжирование
                 image_url = product.get("image_url")
+                clip_status = None
                 if not image_url:
                     try:
                         img_result = await search_product_image(
                             name, max_results=3
                         )
-                        urls      = img_result.get("urls", [])
-                        image_url = urls[0] if urls else None
-                        if not image_url:
+                        clip_status = img_result.get("status", "no_match")
+                        best_url    = img_result.get("best_url")
+                        best_score  = img_result.get("best_score", 0)
+
+                        if clip_status == "accepted":
+                            image_url = best_url
+                            logger.info(
+                                "CLIP: %s — принято (R=%.3f)", name, best_score
+                            )
+                        elif clip_status == "needs_verification":
+                            image_url = best_url
+                            needs_verification.append(
+                                {"name": name, "url": best_url, "score": best_score}
+                            )
+                            logger.info(
+                                "CLIP: %s — требует верификации (R=%.3f)",
+                                name, best_score,
+                            )
+                        else:
+                            image_url = None
                             no_image += 1
+                            logger.info(
+                                "CLIP: %s — отклонено (R=%.3f)", name, best_score
+                            )
                     except Exception as e:
                         logger.warning(f"Ошибка поиска фото для {name}: {e}")
                         no_image += 1
@@ -151,6 +173,16 @@ async def select_platform(callback: CallbackQuery, state: FSMContext):
             f"❌ Ошибок: {failed}\n\n"
             f"⏳ Запускаю публикацию на {platform}..."
         )
+
+        # Уведомление о товарах, требующих верификации фото (CLIP R ∈ [0.45; 0.60))
+        if needs_verification:
+            lines = ["⚠️ Следующие товары требуют проверки фото (низкая уверенность CLIP):\n"]
+            for item in needs_verification:
+                lines.append(
+                    f"  - {item['name']} (R={item['score']:.2f})\n"
+                    f"    {item['url']}"
+                )
+            await callback.message.answer("\n".join(lines))
 
         # Шаг 5 — публикуем на Авито (HTML-сайт)
         if callback.data in ("platform_avito", "platform_all"):
